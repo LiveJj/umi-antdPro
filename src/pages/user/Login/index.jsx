@@ -191,7 +191,7 @@ const Login = () => {
                   size: 'large',
                   prefix: <UserOutlined className={styles.prefixIcon} />,
                 }}
-                placeholder="用户名: admin or user"
+                placeholder="admin"
                 rules={[
                   {
                     required: true,
@@ -210,7 +210,7 @@ const Login = () => {
                   size: 'large',
                   prefix: <LockOutlined className={styles.prefixIcon} />,
                 }}
-                placeholder="密码: ant.design"
+                placeholder="123456"
                 rules={[
                   {
                     required: true,
@@ -235,7 +235,7 @@ const Login = () => {
                 }}
                 name="phoneNumber"
                 onChange={(e) => setPhoneNum(e.target.value)}
-                placeholder="手机号"
+                placeholder="手机号(1开头的11位数)"
                 rules={[
                   {
                     required: true,

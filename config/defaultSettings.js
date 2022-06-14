@@ -11,5 +11,6 @@ const Settings = {
   title: false,
   pwa: false,
   iconfontUrl: '',
+  menuRender: false,
 };
 export default Settings;

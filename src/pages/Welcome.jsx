@@ -1,41 +1,97 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Row, Input, Avatar, Image, Button } from 'antd';
-import { searchUsers } from '@/services/userLogin';
+import React, { useState, useRef, useLayoutEffect } from 'react';
+import { GridContent, PageContainer } from '@ant-design/pro-layout';
+import { Menu } from 'antd';
+import Banner from './Banner';
+import HubSetch from './HubSetch';
+import { connect } from 'umi';
 
-const SearchUsers = () => {
-  const [dataList, setdataList] = useState([]);
-  let [num, setNum] = useState(30);
-  useEffect(() => {
-    if (num == 30) return;
-    if (num == 0) return setNum(30);
-    const id = setInterval(count, 1000);
-    return () => clearInterval(id);
-  }, [count, num]);
-  const gitHubSearch = async (value, event) => {
-    const res = await searchUsers({ q: value });
-    setdataList(res.items);
+import styles from './Welcome.less';
+const { Item } = Menu;
+
+function Layout({ market: { clname, xlname }, dispatch, loading }) {
+  const menuMap = {
+    first: clname,
+    two: xlname,
   };
-  const count = useCallback((value, event) => setNum(--num), [num]);
-  return (
-    <div style={{ padding: '20px 30px' }}>
-      <Input.Group compact size="large">
-        <Input style={{ width: 'calc(100% - 150px)' }} placeholder="一个简单的获取验证码功能" />
-        <Button type="primary" onClick={count} size="large" disabled={num !== 30 ? true : false}>
-          {num == 30 ? '获取验证码' : num + '秒后重新获取'}
-        </Button>
-      </Input.Group>
-      <Input.Search onSearch={gitHubSearch} enterButton placeholder="搜索GitHub用户" size="large" />
-      <Row gutter={[16, 48]} style={{ marginTop: 30 }}>
-        {dataList?.map((item) => (
-          <Avatar
-            key={item.id}
-            size={{ xs: 48, sm: 60, md: 76, lg: 96, xl: 120, xxl: 150 }}
-            src={<Image src={item.avatar_url} />}
-          />
-        ))}
-      </Row>
-    </div>
-  );
-};
+  const [initConfig, setInitConfig] = useState({
+    mode: 'inline',
+    selectKey: 'contact',
+  });
+  const dom = useRef();
 
-export default SearchUsers;
+  const resize = () => {
+    requestAnimationFrame(() => {
+      if (!dom.current) {
+        return;
+      }
+
+      let mode = 'inline';
+      const { offsetWidth } = dom.current;
+
+      if (dom.current.offsetWidth < 641 && offsetWidth > 400) {
+        mode = 'horizontal';
+      }
+
+      if (window.innerWidth < 768 && offsetWidth > 400) {
+        mode = 'horizontal';
+      }
+
+      setInitConfig({ ...initConfig, mode: mode });
+    });
+  };
+
+  useLayoutEffect(() => {
+    if (dom.current) {
+      window.addEventListener('resize', resize);
+      resize();
+    }
+    return () => {
+      window.removeEventListener('resize', resize);
+    };
+  }, [dom.current]);
+
+  const getMenu = () => {
+    return Object.keys(menuMap).map((item) => <Item key={item}>{menuMap[item]}</Item>);
+  };
+
+  const renderChildren = () => {
+    const { selectKey } = initConfig;
+
+    switch (selectKey) {
+      case 'first':
+        return <HubSetch />;
+
+      case 'two':
+        return <Banner />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <PageContainer>
+      <div className={styles.main}>
+        <div className={styles.leftMenu}>
+          <Menu
+            mode={initConfig.mode}
+            selectedKeys={[initConfig.selectKey]}
+            onClick={({ key }) => {
+              setInitConfig({ ...initConfig, selectKey: key });
+            }}
+          >
+            {getMenu()}
+          </Menu>
+        </div>
+        <div className={styles.right}>
+          <div className={styles.title}>{menuMap[initConfig.selectKey]}</div>
+          {renderChildren()}
+        </div>
+      </div>
+    </PageContainer>
+  );
+}
+
+export default connect((state) => ({
+  market: state.market,
+  loading: state.loading,
+}))(Layout);
