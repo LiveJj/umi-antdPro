@@ -1,0 +1,28 @@
+.imgs {
+  height: 400px;
+}
+:global {
+  .ant-carousel .slick-dots li button {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+  }
+  .ant-carousel .slick-dots li.slick-active {
+    width: 16px;
+  }
+  .ant-carousel .slick-dots li.slick-active button {
+    background: rgb(246, 140, 12);
+    transform: translate(0px, -10px);
+    transition: transform 1s ease-out;
+    // animation-name: example;
+    // animation-duration: 3s;
+  }
+}
+// @keyframes example {
+//   from {
+//     top: 0px;
+//   }
+//   to {
+//     top: -10px;
+//   }
+// }
